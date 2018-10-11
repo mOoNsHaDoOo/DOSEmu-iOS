@@ -70,10 +70,6 @@ static struct {
 @end
 
 @interface DosPadViewController_iPhone()
-{
-	// Only used in portrait mode
-	UIView *_rootContainer;
-}
 
 @property(nonatomic, strong) KeyMapper *keyMapper;
 @property(nonatomic, strong) UIAlertView *keyMapperAlertView;
@@ -92,18 +88,13 @@ static struct {
     //---------------------------------------------------
 	self.view.backgroundColor = HexColor(0x585458);
 	self.view.userInteractionEnabled = YES;
-	CGRect viewRect = [self safeRootRect];
-	_rootContainer = [[UIView alloc] initWithFrame:viewRect];
-    [self.view addSubview:_rootContainer];
-	
+	CGRect viewRect = self.view.bounds;
+    
     //---------------------------------------------------
     // 2. Create the toolbar in portrait mode
     //---------------------------------------------------
 
-    toolPanel = [[ToolPanelView alloc] initWithFrame:CGRectMake(
-    	viewRect.origin.x + (viewRect.size.width-320)/2,
-    	viewRect.origin.y + 240,
-    	320,25)];
+    toolPanel = [[ToolPanelView alloc] initWithFrame:CGRectMake(0,240,320,25)];
 
     UIButton *btnOption = [[UIButton alloc] initWithFrame:CGRectMake(0,0,32,25)];
     UIButton *btnLeft = [[UIButton alloc] initWithFrame:CGRectMake(33,0,67,25)];
@@ -125,7 +116,7 @@ static struct {
     labCycles.textColor=[UIColor colorWithRed:74/255.0 green:1 blue:55/255.0 alpha:1];
     labCycles.font=[UIFont fontWithName:@"DBLCDTempBlack" size:12];
     labCycles.text=[self currentCycles];
-    labCycles.textAlignment = NSTextAlignmentCenter;
+    labCycles.textAlignment=UITextAlignmentCenter;
     labCycles.baselineAdjustment=UIBaselineAdjustmentAlignCenters;
     fsIndicator = [FrameskipIndicator alloc];
     fsIndicator = [fsIndicator initWithFrame:CGRectMake(labCycles.frame.size.width-8,2,4,labCycles.frame.size.height-4)
@@ -137,7 +128,7 @@ static struct {
     [toolPanel addSubview:btnLeft];
     [toolPanel addSubview:btnRight];
     [toolPanel addSubview:labCycles];
-    [_rootContainer addSubview:toolPanel];
+    [self.view addSubview:toolPanel];     
     
     //---------------------------------------------------
     // 3. <null>
@@ -159,14 +150,14 @@ static struct {
     //---------------------------------------------------
     // 7. Banner at the top
     //---------------------------------------------------
-    banner = [[UILabel alloc] initWithFrame:CGRectMake(0,0,viewRect.size.width,44)];
+    banner = [[UILabel alloc] initWithFrame:CGRectMake(0,0,320,44)];
     banner.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     banner.backgroundColor = [UIColor clearColor];
     banner.text = @"Quit Game First";
     banner.textColor = [UIColor whiteColor];
-    banner.textAlignment = NSTextAlignmentCenter;
+    banner.textAlignment = UITextAlignmentCenter;
     banner.alpha = 0;
-    [_rootContainer addSubview:banner];
+    [self.view addSubview:banner];
     
     //---------------------------------------------------
     // 8. Navigation Bar Show Button
@@ -174,11 +165,11 @@ static struct {
 #ifdef IDOS
     if (!autoExit)
     {
-        UIButton *btnTop = [[UIButton alloc] initWithFrame:CGRectMake(0,0,viewRect.size.width,30)];
+        UIButton *btnTop = [[UIButton alloc] initWithFrame:CGRectMake(0,0,320,30)];
         btnTop.backgroundColor=[UIColor clearColor];
         btnTop.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [btnTop addTarget:self action:@selector(showNavigationBar) forControlEvents:UIControlEventTouchUpInside];
-        [_rootContainer addSubview:btnTop];
+        [self.view addSubview:btnTop];
     }
 #endif
     
@@ -195,13 +186,7 @@ static struct {
 
 	// Create the button larger than the image, so we have a bigger clickable area,
 	// while visually takes smaller place
-	btnDPadSwitch = [[UIButton alloc] initWithFrame:CGRectMake(
-		viewRect.size.width/2-38,
-		viewRect.size.height-25,
-		76,25)];
-	btnDPadSwitch.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin
-		| UIViewAutoresizingFlexibleLeftMargin
-		| UIViewAutoresizingFlexibleRightMargin);
+	btnDPadSwitch = [[UIButton alloc] initWithFrame:CGRectMake(viewRect.size.width/2-38,viewRect.size.height-25,76,25)];
 	UIImageView *imgTmp = [[UIImageView alloc] initWithFrame:CGRectMake(2, 2, 72, 16)];
 	imgTmp.image = [UIImage imageNamed:@"switch"];
 	[btnDPadSwitch addSubview:imgTmp];
@@ -210,15 +195,16 @@ static struct {
 	[btnDPadSwitch addSubview:slider];
 	[btnDPadSwitch addTarget:self action:@selector(onGamePadModeSwitch:)
 		forControlEvents:UIControlEventTouchUpInside];
-	[_rootContainer addSubview:btnDPadSwitch];
-   	btnDPadSwitch.hidden = YES;
+	[self.view addSubview:btnDPadSwitch];
+    btnDPadSwitch.hidden = YES;
+    
 }
 
 - (void)toggleInputSource:(id)sender
 {
     btnDPadSwitch.hidden = YES;
     UIButton *btn = (UIButton*)sender;
-    InputSourceType type = (InputSourceType)[btn tag];
+    InputSourceType type = [btn tag];
     if ([self isInputSourceActive:type]) {
         [self removeInputSource:type];
     } else {
@@ -241,7 +227,7 @@ static struct {
         labCycles2.textColor=[UIColor colorWithRed:74/255.0 green:1 blue:55/255.0 alpha:1];
         labCycles2.font=[UIFont fontWithName:@"DBLCDTempBlack" size:12];
         labCycles2.text=[self currentCycles];
-        labCycles2.textAlignment= NSTextAlignmentCenter;
+        labCycles2.textAlignment=UITextAlignmentCenter;
         labCycles2.baselineAdjustment=UIBaselineAdjustmentAlignCenters;
         fsIndicator2 = [FrameskipIndicator alloc];
         fsIndicator2 = [fsIndicator2 initWithFrame:CGRectMake(labCycles2.frame.size.width-8,2,4,labCycles2.frame.size.height-4)
@@ -409,14 +395,7 @@ static struct {
 	}
 	CGRect rect;
 	if ([self isPortrait]) {
-		rect = _rootContainer.bounds;
-		float maxHeight = 300;
-		rect.origin.y = 265;
-		rect.size.height -= 265;
-		if (rect.size.height > maxHeight) {
-			rect.origin.y += rect.size.height - maxHeight;
-			rect.size.height = maxHeight;
-		}
+		rect = CGRectMake(0, 265, self.view.bounds.size.width, self.view.bounds.size.height - 265);
 	} else {
 		rect = CGRectMake(0, self.view.bounds.size.height-175, self.view.bounds.size.width, 175);
 	}
@@ -424,12 +403,11 @@ static struct {
 									   frame:rect];
 	if ([self isLandscape]) {
 		kbd.alpha = [self floatAlpha];
-		[self.view addSubview:kbd];
 	} else {
 		kbd.backgroundColor = [[ColorTheme defaultTheme] colorByName:@"keyboard-background"];
-		[_rootContainer addSubview:kbd];
 	}
 	
+	[self.view addSubview:kbd];
     kbd.externKeyDelegate = remapControlsModeOn ? self : nil;
     [self refreshKeyMappingsInViews];
 }
@@ -456,18 +434,7 @@ static struct {
 				 gpad.frame.size.width, gpad.frame.size.height);
 		if ([self isPortrait])
 		{
-			CGRect grect = gpad.frame;
-			CGRect r = _rootContainer.bounds;
-			CGFloat maxHeight = 300;
-
-			// In portrait mode, we assume gamepad width is 320
-			grect.size.width = 320;
-			grect.origin.x = (r.size.width - grect.size.width) / 2;
-			
-			if (r.size.height - grect.origin.y > maxHeight)
-				grect.origin.y = r.size.height - maxHeight;
-			gpad.frame = grect;
-			[_rootContainer insertSubview:gpad belowSubview:toolPanel];
+			[self.view insertSubview:gpad belowSubview:toolPanel];
 		}
 		else
 		{
@@ -512,7 +479,6 @@ static struct {
 {
 	if ([self isPortrait])
 	{
-		_rootContainer.frame = [self safeRootRect];
 		toolPanel.alpha=1;
 		[self removeInputSource:InputSource_PCKeyboard];
 		[self createGamepad];
@@ -559,12 +525,6 @@ static struct {
     }
 
     [UIView commitAnimations];
-}
-
-- (void)viewDidLayoutSubviews
-{
-	NSLog(@"viewDidLayoutSubviews");
-	[super viewDidLayoutSubviews];
 }
 
 - (void)viewDidLoad 
@@ -673,15 +633,6 @@ static struct {
     return YES;
 }
 
-#define ISIPHONEX() ([[UIScreen mainScreen] nativeBounds].size.height==2436)
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations
-{
-	if (ISIPHONEX())
-    	return UIInterfaceOrientationMaskPortrait;
-	else
-		return UIInterfaceOrientationMaskAll;
-}
-
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
@@ -695,34 +646,12 @@ static struct {
     // e.g. self.myOutlet = nil;
 }
 
-- (CGRect)safeRootRect
-{
-	if (@available(iOS 11.0, *)) {
-		UIEdgeInsets i = self.view.safeAreaInsets;
-		CGRect rect = self.view.bounds;
-		rect.origin.x = i.left;
-		rect.origin.y = i.top;
-		rect.size.width -= i.left + i.right;
-		rect.size.height -= i.top + i.bottom;
-		return rect;
-	} else {
-		return self.view.bounds;
-	}
-}
-
-- (void)viewSafeAreaInsetsDidChange
-{
-	NSLog(@"viewSafeAreaInsetsDidChange");
-	[self updateUI];
-	[super viewSafeAreaInsetsDidChange];
-}
-
 /*
  * Handle dos screen resize.
  */
 -(void)onResize:(CGSize)sizeNew
 {
-	CGRect viewRect = [self safeRootRect];
+	CGRect viewRect = self.view.bounds;
 	
 	screenView.bounds = CGRectMake(0, 0, sizeNew.width, sizeNew.height);
 	int maxWidth, maxHeight;
@@ -733,7 +662,7 @@ static struct {
 	{
 		maxWidth = 320;
 		maxHeight = 240;
-		ptCenter = CGPointMake(viewRect.size.width/2, viewRect.origin.y+120);
+		ptCenter = CGPointMake(viewRect.size.width/2, 120);
 	}
 	else
 	{
@@ -741,13 +670,13 @@ static struct {
 		{
 			maxWidth = 320;
 			maxHeight= 240;
-			ptCenter = CGPointMake(viewRect.size.width/2, viewRect.origin.y+120);
+			ptCenter = CGPointMake(viewRect.size.width/2, 120);
 		}
 		else
 		{
 			maxWidth = viewRect.size.width;
 			maxHeight= viewRect.size.height;
-			ptCenter = CGPointMake(viewRect.origin.x+viewRect.size.width/2, viewRect.origin.y+viewRect.size.height/2);
+			ptCenter = CGPointMake(viewRect.size.width/2, viewRect.size.height/2);
 		}
 	}
 	

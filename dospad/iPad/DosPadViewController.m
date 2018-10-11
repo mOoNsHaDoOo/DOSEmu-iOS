@@ -53,9 +53,7 @@ static struct {
 @end
 
 @interface DosPadViewController()
-{
-    UIImageView *baseView;
-}
+
 @property(nonatomic, strong) KeyMapper *keyMapper;
 @property(nonatomic, strong) UIAlertView *keyMapperAlertView;
 @property(nonatomic, strong) MfiGameControllerHandler *mfiHandler;
@@ -70,21 +68,17 @@ static struct {
     return [self isLandscape];
 }
 
-- (void)initView
+- (void)loadView
 {
     //---------------------------------------------------
     // 1. Create View
     //---------------------------------------------------
-    baseView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,768,1024)];
+    UIImageView *baseView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,768,1024)];
     baseView.contentMode = UIViewContentModeCenter;
-    baseView.userInteractionEnabled = YES;
-    [self.view addSubview:baseView];
+    self.view = baseView;
     self.view.backgroundColor = [UIColor blackColor];
-    baseView.center = CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2);
-    baseView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin
-        | UIViewAutoresizingFlexibleBottomMargin
-        | UIViewAutoresizingFlexibleLeftMargin
-        | UIViewAutoresizingFlexibleRightMargin;
+    self.view.userInteractionEnabled = YES;
+
     //---------------------------------------------------
     // 2. Create Cycles and Frameskip Indicator
     //---------------------------------------------------    
@@ -92,28 +86,28 @@ static struct {
     labCycles.backgroundColor = [UIColor clearColor];
     labCycles.textColor=[UIColor colorWithRed:74/255.0 green:1 blue:55/255.0 alpha:1];
     labCycles.text = [self currentCycles];
-    labCycles.textAlignment = NSTextAlignmentCenter;
+    labCycles.textAlignment=UITextAlignmentCenter;
     labCycles.baselineAdjustment=UIBaselineAdjustmentAlignCenters;
     labCycles.font=[UIFont fontWithName:@"DBLCDTempBlack" size:30];
     fsIndicator = [[FrameskipIndicator alloc] initWithFrame:CGRectMake(0,labCycles.frame.size.height-4,labCycles.frame.size.width, 4)
                                                       style:FrameskipIndicatorStyleHorizontal];
     fsIndicator.count = [self currentFrameskip];
     [labCycles addSubview:fsIndicator];
-    [baseView addSubview:labCycles];
+    [self.view addSubview:labCycles];
     
     //---------------------------------------------------
     // 3. Create Keyboard
     //---------------------------------------------------     
     keyboard = [[KeyboardView alloc] initWithType:KeyboardTypePortrait
                                             frame:CGRectMake(14,648,740,360)];
-    [baseView addSubview:keyboard];
+    [self.view addSubview:keyboard];
     
     //---------------------------------------------------
     // 4. Create Slider
     //---------------------------------------------------    
     sliderInput=[[SliderView alloc] initWithFrame:CGRectMake(405,967,146,32)];
     [sliderInput setActionOnSliderChange:@selector(onSliderChange) target:self];
-    [baseView addSubview:sliderInput];
+    [self.view addSubview:sliderInput];
     
     //---------------------------------------------------
     // 5. Create Mouse Buttons
@@ -124,8 +118,8 @@ static struct {
     [btnMouseLeftP addTarget:self action:@selector(onMouseLeftUp) forControlEvents:UIControlEventTouchUpInside];
     [btnMouseRightP addTarget:self action:@selector(onMouseRightDown) forControlEvents:UIControlEventTouchDown];
     [btnMouseRightP addTarget:self action:@selector(onMouseRightUp) forControlEvents:UIControlEventTouchUpInside];    
-    [baseView addSubview:btnMouseLeftP];
-    [baseView addSubview:btnMouseRightP];
+    [self.view addSubview:btnMouseLeftP];
+    [self.view addSubview:btnMouseRightP];
     
     
     //---------------------------------------------------
@@ -133,7 +127,7 @@ static struct {
     //---------------------------------------------------    
     btnOption = [[UIButton alloc] initWithFrame:CGRectMake(632,592,79,46)];
     [btnOption addTarget:self action:@selector(showOption) forControlEvents:UIControlEventTouchUpInside];
-    [baseView addSubview:btnOption];
+    [self.view addSubview:btnOption];
     
     //---------------------------------------------------
     // 8. Create Command List Button
@@ -142,7 +136,7 @@ static struct {
     [btnShowCommands addTarget:self
                         action:@selector(showCommandList)
               forControlEvents:UIControlEventTouchUpInside];
-    [baseView addSubview:btnShowCommands];
+    [self.view addSubview:btnShowCommands];
     
     //---------------------------------------------------
     // 9. Create back Button
@@ -152,7 +146,7 @@ static struct {
     {
         btnBack = [[UIButton alloc] initWithFrame:CGRectMake(0,0,140,44)];
         [btnBack addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
-        [baseView addSubview:btnBack];
+        [self.view addSubview:btnBack];
     }
 #endif
     
@@ -165,8 +159,8 @@ static struct {
     joystiqLight.frame=CGRectMake(328,976,20,14);
     gamepadLight.alpha=0;
     joystiqLight.alpha=0;
-    [baseView addSubview:gamepadLight];
-    [baseView addSubview:joystiqLight];
+    [self.view addSubview:gamepadLight];
+    [self.view addSubview:joystiqLight];
     
     //---------------------------------------------------
     // 11. Portrait GamePad/Joystick switch
@@ -176,13 +170,13 @@ static struct {
     [btnToGamePad addTarget:self
                      action:@selector(toggleGamePad)
            forControlEvents:UIControlEventTouchUpInside];
-    [baseView addSubview:btnToGamePad];
+    [self.view addSubview:btnToGamePad];
     
     UIButton *btnToJoy = [[UIButton alloc] initWithFrame:CGRectMake(326,968,72,34)];
     [btnToJoy addTarget:self
                      action:@selector(toggleJoystick)
            forControlEvents:UIControlEventTouchUpInside];
-    [baseView addSubview:btnToJoy];
+    [self.view addSubview:btnToJoy];
     
     
     //---------------------------------------------------
@@ -234,7 +228,7 @@ static struct {
         labCycles2.textColor=[UIColor colorWithRed:74/255.0 green:1 blue:55/255.0 alpha:1];
         labCycles2.font=[UIFont fontWithName:@"DBLCDTempBlack" size:17];
         labCycles2.text=[self currentCycles];
-        labCycles2.textAlignment = NSTextAlignmentCenter;
+        labCycles2.textAlignment=UITextAlignmentCenter;
         labCycles2.baselineAdjustment=UIBaselineAdjustmentAlignCenters;
         fsIndicator2 = [FrameskipIndicator alloc];
         fsIndicator2 = [fsIndicator2 initWithFrame:CGRectMake(labCycles2.frame.size.width-8,0,8,labCycles2.frame.size.height-4)
@@ -322,9 +316,8 @@ static struct {
 
 - (void)createPCKeyboard
 {
-    CGFloat x = (self.view.frame.size.width - 1024)/2;
     kbd = [[KeyboardView alloc] initWithType:KeyboardTypeLandscape
-        frame:CGRectMake(x,self.view.bounds.size.height-250,1024,250)];
+                                                   frame:CGRectMake(0,self.view.bounds.size.height-250,1024,250)];
     kbd.alpha = [self floatAlpha];
     [self.view addSubview:kbd];
     [self refreshKeyMappingsInViews];
@@ -337,10 +330,8 @@ static struct {
 
 - (void)createMouseButtons
 {
-    CGFloat x = self.view.frame.size.width - 44;
-    CGFloat y = self.view.frame.size.height - (768-460);
-    btnMouseRight = [[UIButton alloc] initWithFrame:CGRectMake(x,y,48,90)];
-    btnMouseLeft = [[UIButton alloc] initWithFrame:CGRectMake(x,y+90,48,90)];
+    btnMouseRight = [[UIButton alloc] initWithFrame:CGRectMake(980,460,48,90)];
+    btnMouseLeft = [[UIButton alloc] initWithFrame:CGRectMake(980,550,48,90)];
     [btnMouseLeft setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
     [btnMouseLeft setTitle:@"L" forState:UIControlStateNormal];
     [btnMouseLeft setBackgroundImage:[UIImage imageNamed:@"longbutton"] 
@@ -373,52 +364,35 @@ static struct {
     
     if (configPath == nil) return nil;
 
-	BOOL isPortrait = [self isPortrait];
-    NSString *section = (isPortrait ? @"[gamepad.ipad.portrait]" : @"[gamepad.ipad.landscape]");
+    NSString *section = ([self isPortrait] ?
+                         @"[gamepad.ipad.portrait]" : 
+                         @"[gamepad.ipad.landscape]");
+    
     NSString *ui_cfg = [ConfigManager uiConfigFile];
 
     gpad = [[GamePadView alloc] initWithConfig:ui_cfg section:section];
-	
-    // In portrait mode, we need to insert two background images
-    if (isPortrait)
+
+    if (![self isFullscreen])
     {
         UIImageView *left = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ipadleftside"]];
         UIImageView *right = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ipadrightside"]];
-		left.frame = CGRectMake(1,19,280,378);
-		right.frame = CGRectMake(441,30,327,315);
-		gpad.backgroundColor=[UIColor clearColor];
-		[gpad insertSubview:left atIndex:0];
-		[gpad insertSubview:right atIndex:0];
+        left.frame = CGRectMake(1,19,280,378);
+        right.frame = CGRectMake(441,30,327,315);
+        gpad.backgroundColor=[UIColor clearColor];
+        [gpad insertSubview:left atIndex:0];
+        [gpad insertSubview:right atIndex:0];
     }
-	
-	// Make adjustment for screen sizes that are not 768x1024 or 1024x768
-	// Shift all down towards the bottom,
-	// and pull right part towards the right edge.
-    CGPoint leftPartOffset = CGPointMake(0, self.view.bounds.size.height - 1024);
-    CGPoint rightPartOffset = CGPointMake(self.view.bounds.size.width - 768,
-    	self.view.bounds.size.height - 1024);
-	for (UIView *v in gpad.subviews)
-	{
-		if (v.center.x < (isPortrait?768:1024)/2) // left
-		{
-			v.frame = CGRectOffset(v.frame, leftPartOffset.x, leftPartOffset.y);
-		}
-		else
-		{
-			v.frame = CGRectOffset(v.frame, rightPartOffset.x, rightPartOffset.y);
-		}
-	}
-
+    
     gpad.mode = mod;    
-    if (isPortrait)
-    {
-        [self.view addSubview:gpad];
-    }
-    else
+    if ([self isFullscreen]) 
     {
         gpad.dpadMovable = DEFS_GET_INT(kDPadMovable);
         gpad.alpha = [self floatAlpha];
         [self.view insertSubview:gpad belowSubview:fullscreenPanel];
+    }
+    else
+    {
+        [self.view addSubview:gpad];
     }
     return gpad;
 }
@@ -446,9 +420,9 @@ static struct {
 #else
         img = [UIImage imageNamed:@"dospadportrait.jpg"];        
 #endif
-        [baseView setImage:img];
+        [(UIImageView*)self.view setImage:img];
     } else {
-        [baseView setImage:nil];
+        [(UIImageView*)self.view setImage:nil];
     }
 }
 
@@ -469,7 +443,6 @@ static struct {
     [self updateBackground];    
     if ([self isFullscreen]) 
     {
-        [self.view insertSubview:self.screenView atIndex:0];
         keyboard.alpha=0;
         sliderInput.alpha=0;
         btnOption.alpha=0;
@@ -506,20 +479,8 @@ static struct {
     }
     else 
     {
-        [baseView insertSubview:self.screenView atIndex:0];
-		
-		// Scaling baseView to fill self.view as much as possible
-		if (baseView.bounds.size.width != self.view.bounds.size.width ||
-			baseView.bounds.size.height != self.view.bounds.size.height)
-		{
-			float scaleX = self.view.bounds.size.width/baseView.frame.size.width;
-			float scaleY = self.view.bounds.size.height/baseView.frame.size.height;
-			float scale = MIN(scaleX, scaleY);
-			baseView.transform = CGAffineTransformMakeScale(scaleX, scaleY);
-			baseView.center = CGPointMake(self.view.bounds.size.width/2,
-				self.view.bounds.size.height/2);
-		}
-		
+        float vh = self.view.bounds.size.height;
+        float kh = keyboard.bounds.size.height;
         float scale=1;
         if (sw < 640) { scale = 640.0f/sw; }
         screenView.transform=CGAffineTransformMakeScale(scale,scale*additionalScaleY);
@@ -558,8 +519,6 @@ static struct {
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self initView];
-    [baseView insertSubview:self.screenView atIndex:0];
 }
 
 

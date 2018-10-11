@@ -34,7 +34,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>20171230.1132</string>
+	<string>20180516.1852</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSMainNibFile</key>
@@ -63,8 +63,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UISupportsDocumentBrowser</key>
-	<true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>

@@ -272,13 +272,7 @@ int main(int argc, char *argv[]) {
         FileSystemObject *fso = [FileSystemObject alloc];
 
         // Auto mount
-#ifndef IDOS // DOSPAD for CYDIA
-        strcpy(diskc, "/var/mobile/Documents");
-        strcpy(diskd, [[fso documentsDirectory] UTF8String]);
-#else
         strcpy(diskc, [[fso documentsDirectory] UTF8String]);
-        strcpy(diskd, "/var/mobile/Documents");
-#endif
         
         NSString *cPath=[NSString stringWithUTF8String:diskc];
         NSString *dPath=[NSString stringWithUTF8String:diskd];
@@ -304,16 +298,13 @@ int main(int argc, char *argv[]) {
         /* On Non-JB device, /var/mobile/Documents doesn't exists */
         if ([fso ensureDirectoryExists:cPath]) {
             strcpy(automount_path, [cPath UTF8String]);
-#ifndef IDOS
             strcat(automount_path, ";");
-#endif
         }
 	
-#ifndef IDOS    
         if ([fso ensureDirectoryExists:dPath]) {
             strcat(automount_path, [dPath UTF8String]);
         }
-#endif    
+
         int retVal = UIApplicationMain(argc, argv, @"DosPadUIApplication", nil);
         return retVal;
     }
