@@ -1,7 +1,7 @@
 dospad
 ======
 
-Why msdos in 2018 ? on iPad ? 
+Why MS-DOS in 2018 ? on iPad ? 
 
 Because!
 
